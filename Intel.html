@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KAJ Cafe Redeem</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: linear-gradient(135deg, #ffe4e6, #fef3c7, #dcfce7);
+    }
+
+    .wrap {
+      max-width: 900px;
+      margin: auto;
+      padding: 24px;
+    }
+
+    .hero, .card {
+      background: white;
+      border-radius: 20px;
+      padding: 24px;
+      margin-top: 20px;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      color: #ef4444;
+      font-size: 46px;
+      margin: 0;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    input {
+      padding: 12px;
+      border-radius: 10px;
+      border: 2px solid #ccc;
+      width: 240px;
+      max-width: 90%;
+      margin: 6px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 10px;
+      background: #ef4444;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 6px;
+      font-size: 16px;
+    }
+
+    .result {
+      margin-top: 12px;
+      font-weight: bold;
+      min-height: 24px;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+      padding-bottom: 20px;
+    }
+
+    .small {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>KAJ CAFE</h1>
+      <p>Coupon Redeem Page</p>
+      <p><strong>Owned by Joshler, Kobe & Jaylyn</strong></p>
+    </div>
+
+    <div class="card">
+      <h2>Redeem Coupon</h2>
+      <input id="coupon" placeholder="Enter code" />
+      <br>
+      <button onclick="redeem()">Redeem</button>
+      <div id="result" class="result"></div>
+      <p class="small">Enter your coupon code to redeem your deal.</p>
+    </div>
+
+    <div class="card">
+      <button onclick="openOwnerPanel()">Owner Login</button>
+
+      <div id="ownerPanel" style="display:none; margin-top:16px;">
+        <h2>Owner Panel</h2>
+        <input id="newCoupon" placeholder="Enter new coupon code" />
+        <br>
+        <button onclick="addCoupon()">Add Coupon</button>
+        <button onclick="resetUsedCodes()">Reset Used Codes</button>
+        <div id="ownerResult" class="result"></div>
+      </div>
+    </div>
+
+    <div class="footer">kajcaferedeem.com</div>
+  </div>
+
+  <script>
+    let coupons = [
+      "4831-7294-05","9052-1847-36","6174-9035-82","2840-5197-63","7395-1084-26",
+      "1509-8743-62","6428-9305-17","8713-4502-96","3094-7851-20","5640-2187-93",
+      "7841-6305-42","2159-0483-76","9305-6271-48","4176-0952-83","6520-3847-19",
+      "7438-5106-92","1083-6945-27","5802-9174-63","2691-7405-38","9058-2137-64",
+      "7401-6283-95","5198-3074-26","8620-4519-37","4073-9625-81","9382-6150-47"
+    ];
+
+    let savedCoupons = JSON.parse(localStorage.getItem("kajCoupons"));
+    if (savedCoupons && Array.isArray(savedCoupons)) {
+      coupons = savedCoupons;
+    }
+
+    function saveCoupons() {
+      localStorage.setItem("kajCoupons", JSON.stringify(coupons));
+    }
+
+    function redeem() {
+      let code = document.getElementById("coupon").value.trim();
+      let result = document.getElementById("result");
+      let usedCodes = JSON.parse(localStorage.getItem("usedCodes")) || [];
+
+      if (code === "") {
+        result.innerHTML = "Please enter a code.";
+        result.style.color = "red";
+        return;
+      }
+
+      if (usedCodes.includes(code)) {
+        result.innerHTML = "This coupon has already been used.";
+        result.style.color = "red";
+        return;
+      }
+
+      if (coupons.includes(code)) {
+        usedCodes.push(code);
+        localStorage.setItem("usedCodes", JSON.stringify(usedCodes));
+        result.innerHTML = "Coupon accepted! Show this to the cashier.";
+        result.style.color = "green";
+      } else {
+        result.innerHTML = "Invalid code.";
+        result.style.color = "red";
+      }
+    }
+
+    function openOwnerPanel() {
+      let password = prompt("Enter owner password:");
+      if (password === "kajowners123") {
+        document.getElementById("ownerPanel").style.display = "block";
+      } else {
+        alert("Wrong password.");
+      }
+    }
+
+    function addCoupon() {
+      let newCode = document.getElementById("newCoupon").value.trim();
+      let ownerResult = document.getElementById("ownerResult");
+
+      if (newCode === "") {
+        ownerResult.innerHTML = "Enter a coupon code.";
+        ownerResult.style.color = "red";
+        return;
+      }
+
+      if (coupons.includes(newCode)) {
+        ownerResult.innerHTML = "That code already exists.";
+        ownerResult.style.color = "red";
+        return;
+      }
+
+      coupons.push(newCode);
+      saveCoupons();
+      ownerResult.innerHTML = "Coupon added!";
+      ownerResult.style.color = "green";
+      document.getElementById("newCoupon").value = "";
+    }
+
+    function resetUsedCodes() {
+      localStorage.removeItem("usedCodes");
+      document.getElementById("ownerResult").innerHTML = "Used coupons reset.";
+      document.getElementById("ownerResult").style.color = "green";
+    }
+  </script>
+</body>
+</html>
