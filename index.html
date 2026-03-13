@@ -52,7 +52,13 @@ let code=document.getElementById("coupon").value.toUpperCase();
 let result=document.getElementById("result");
 
 if(coupons[code]){
-result.innerHTML=coupons[code];
+result.innerHTML=coupons[let coupons = [
+"4831-7294-05","9052-1847-36","6174-9035-82","2840-5197-63","7395-1084-26",
+"1509-8743-62","6428-9305-17","8713-4502-96","3094-7851-20","5640-2187-93",
+"7841-6305-42","2159-0483-76","9305-6271-48","4176-0952-83","6520-3847-19",
+"7438-5106-92","1083-6945-27","5802-9174-63","2691-7405-38","9058-2137-64",
+"7401-6283-95","5198-3074-26","8620-4519-37","4073-9625-81","9382-6150-47"
+];];
 result.style.color="green";
 }else{
 result.innerHTML="Invalid code";
