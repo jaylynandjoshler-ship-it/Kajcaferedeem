@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Snack Stick Shop</title>
+
+<style>
+
+body{
+font-family: Comic Sans MS, Arial;
+text-align:center;
+background: linear-gradient(45deg,#ff8bd1,#ffb347,#7df9ff,#9bff8b);
+background-size:400% 400%;
+animation:bgmove 12s infinite alternate;
+}
+
+@keyframes bgmove{
+0%{background-position:left}
+100%{background-position:right}
+}
+
+.container{
+background:white;
+padding:20px;
+margin:20px auto;
+width:360px;
+border-radius:20px;
+box-shadow:0 0 15px rgba(0,0,0,0.3);
+}
+
+h1{
+color:#ff2e93;
+}
+
+h3{
+color:#00a86b;
+}
+
+input,select{
+padding:10px;
+margin:6px;
+width:90%;
+border-radius:10px;
+border:2px solid #ff4da6;
+}
+
+button{
+padding:10px;
+margin:6px;
+width:95%;
+border:none;
+border-radius:12px;
+background:#ff4da6;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+button:hover{
+background:#ff2e93;
+}
+
+.menu{
+text-align:left;
+background:#fff0f7;
+padding:10px;
+border-radius:10px;
+margin-bottom:10px;
+}
+
+.order{
+background:#ffe6f3;
+margin:6px;
+padding:10px;
+border-radius:10px;
+}
+
+.ready{
+background:#c8ffc8;
+}
+
+#ownerPanel{
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🍓 Snack Stick Shop 🍉</h1>
+<h3>Only at HUNTER PARK</h3>
+
+<div class="container">
+
+<div class="menu">
+<b>Menu</b><br><br>
+
+🍓 Lime Strawberry Stick — $2<br>
+🍓 Strawberry Strawberry Stick — $2<br>
+🍉 Lime Watermelon Stick — $2<br>
+🍉 Strawberry Watermelon Stick — $2<br>
+🔥 Taki Stick — $2<br>
+💥 Fruit Attack — $4
+
+</div>
+
+<input id="name" placeholder="Your Name">
+<input id="phone" placeholder="Your Phone Number">
+
+<select id="order">
+<option value="">Select Item</option>
+<option>Lime Strawberry Stick ($2)</option>
+<option>Strawberry Strawberry Stick ($2)</option>
+<option>Lime Watermelon Stick ($2)</option>
+<option>Strawberry Watermelon Stick ($2)</option>
+<option>Taki Stick ($2)</option>
+<option>Fruit Attack ($4)</option>
+</select>
+
+<input id="coupon" placeholder="Coupon Code (optional)">
+
+<button onclick="placeOrder()">Submit Order</button>
+
+<p id="couponMessage"></p>
+
+</div>
+
+<div class="container">
+
+<h2>🔐 Owner Panel</h2>
+
+<input id="passcode" placeholder="Enter Passcode">
+<button onclick="login()">Login</button>
+
+</div>
+
+<div class="container" id="ownerPanel">
+
+<h2>📋 Orders</h2>
+
+<div id="orders"></div>
+
+<button onclick="clearOrders()">Clear Orders</button>
+
+</div>
+
+<script>
+
+const coupons={
+SAVE5:"5% Off",
+SAVE10:"10% Off",
+VIP20:"20% Off",
+FLASH10:"Flash Sale",
+WELCOME5:"5% Off New Customer"
+};
+
+function placeOrder(){
+
+let name=document.getElementById("name").value;
+let phone=document.getElementById("phone").value;
+let order=document.getElementById("order").value;
+let coupon=document.getElementById("coupon").value.toUpperCase();
+
+if(name==""||phone==""||order==""){
+alert("Enter name, phone number, and choose item!");
+return;
+}
+
+let message="";
+
+if(coupon && coupons[coupon]){
+message="Coupon Applied: "+coupons[coupon];
+}
+else if(coupon){
+message="Invalid Coupon";
+}
+
+document.getElementById("couponMessage").innerText=message;
+
+let orders=JSON.parse(localStorage.getItem("orders")||"[]");
+
+orders.push({
+name:name,
+phone:phone,
+order:order,
+coupon:coupon,
+ready:false
+});
+
+localStorage.setItem("orders",JSON.stringify(orders));
+
+alert("Order placed!");
+
+document.getElementById("name").value="";
+document.getElementById("phone").value="";
+document.getElementById("order").value="";
+document.getElementById("coupon").value="";
+
+}
+
+function login(){
+
+let pass=document.getElementById("passcode").value;
+
+if(pass=="5009"){
+document.getElementById("ownerPanel").style.display="block";
+loadOrders();
+}
+else{
+alert("Wrong passcode");
+}
+
+}
+
+function loadOrders(){
+
+let orders=JSON.parse(localStorage.getItem("orders")||"[]");
+
+let html="";
+
+orders.forEach((o,i)=>{
+
+html+=`
+<div class="order ${o.ready ? "ready":""}">
+<b>${o.name}</b><br>
+📱 ${o.phone}<br>
+🛒 ${o.order}<br>
+🎟️ ${o.coupon || "None"}<br>
+${o.ready ? "✅ READY - TEXT THIS NUMBER" : `<button onclick="markReady(${i})">Ready</button>`}
+</div>
+`;
+
+});
+
+document.getElementById("orders").innerHTML=html;
+
+}
+
+function markReady(index){
+
+let orders=JSON.parse(localStorage.getItem("orders")||"[]");
+
+orders[index].ready=true;
+
+localStorage.setItem("orders",JSON.stringify(orders));
+
+loadOrders();
+
+}
+
+function clearOrders(){
+
+localStorage.removeItem("orders");
+loadOrders();
+
+}
+
+</script>
+
+</body>
+</html>
